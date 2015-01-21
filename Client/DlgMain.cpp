@@ -329,9 +329,6 @@ int CDlgMain::checkList()
 	return res;
 }
 
-
-
-
 void CDlgMain::OnLbnSelchangeListDepartment()
 {
 	// TODO: 在此添加控件通知处理程序代码
@@ -343,4 +340,73 @@ void CDlgMain::OnLbnSelchangeListDepartment()
 void CDlgMain::OnLbnSelchangeListOutfiletype()
 {
 	// TODO: 在此添加控件通知处理程序代码
+}
+
+void CDlgMain::showList()
+{
+	listFilter();
+	if (outputElementVector.size() == 0)
+	{
+		return ;
+	}
+
+	//清空
+	for (int i = m_listboxDepartment.GetCount();i>=0;i--)
+	{
+		m_listboxDepartment.DeleteString(i);
+	}
+
+	for (int i = m_listboxOutputFileType.GetCount();i>=0;i--)
+	{
+		m_listboxOutputFileType.DeleteString(i);
+	}
+	
+	//重置数据
+	m_listboxOutputFileType.AddString(_T("运行"));
+	m_listboxOutputFileType.AddString(_T("警告"));
+	m_listboxOutputFileType.AddString(_T("传输"));
+
+	for (int i = 0;i<outputElementVector.size();i++)
+	{
+		m_listboxDepartment.AddString(outputElementVector[i].department);
+		if (outputElementVector[i].isDepartment)
+		{
+			m_listboxDepartment.SetCheck(i,BST_CHECKED);
+		}
+		else
+		{
+			m_listboxDepartment.SetCheck(i,BST_UNCHECKED);
+		}
+	}
+
+	int temp = m_listboxDepartment.GetCurSel();
+	if (-1 == temp)
+	{
+		temp = 0;
+		m_listboxDepartment.SetCurSel(temp);
+	}
+	if (outputElementVector[temp].isOperation)
+	{
+		m_listboxOutputFileType.SetCheck(0,BST_CHECKED);
+	} 
+	else
+	{
+		m_listboxOutputFileType.SetCheck(0,BST_UNCHECKED);
+	}
+	if (outputElementVector[temp].isAlarm)
+	{
+		m_listboxOutputFileType.SetCheck(1,BST_CHECKED);
+	} 
+	else
+	{
+		m_listboxOutputFileType.SetCheck(1,BST_UNCHECKED);
+	}
+	if (outputElementVector[temp].isTrans)
+	{
+		m_listboxOutputFileType.SetCheck(2,BST_CHECKED);
+	} 
+	else
+	{
+		m_listboxOutputFileType.SetCheck(2,BST_UNCHECKED);
+	}
 }

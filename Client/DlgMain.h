@@ -40,6 +40,7 @@ private:
 	int outputList();
 	int checkList();
 	void listFilter();
+	void showList();//根据数据outputElementVector显示在控件上
 private:
 	CString m_server;
 	CString m_database;
