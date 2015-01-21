@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Persons>
+	<User LoginType = "Admin">
+		<LoginName>system</LoginName>
+		<Password>64071561885fd9fe0f870cb1a981fc73</Password>
+	</User>
+<!--	<User LoginType = "Normal">
+		<LoginName>test0</LoginName>
+		<Password>e68175a14e8024dae135540b9431a423</Password>
+	</User>
+	<User LoginType = "Normal">
+		<LoginName>test1</LoginName>
+		<Password>e4a704ae3f7435cc0c77359bcc224e11</Password>
+	</User>
+	<User LoginType = "Normal">
+		<LoginName>test2</LoginName>
+		<Password>8032133562ac55089daf6f105447fcf0</Password>
+	</User>
+	<User LoginType = "Normal">
+		<LoginName>test3</LoginName>
+		<Password>6591d360e9acedb812dc663472d3ad87</Password>
+	</User>
+	<User LoginType = "Normal">
+		<LoginName>test4</LoginName>
+		<Password>6241c801a2167496537ec27be38ca41f</Password>
+	</User>
+	<User LoginType = "Normal">
+		<LoginName>test5</LoginName>
+		<Password>c4103f122d27677c9db144cae1394a66</Password>
+	</User> -->
+</Persons>
+<!--实际的用户名和密码是 system system test0 000000 test1 111111 test2 222222 test3 333333 test4 444444 test5 555555-->
