@@ -4,11 +4,11 @@
 		<LoginName>system</LoginName>
 		<Password>64071561885fd9fe0f870cb1a981fc73</Password>
 	</User>
-<!--	<User LoginType = "Normal">
+	<User LoginType = "Normal">
 		<LoginName>test0</LoginName>
 		<Password>e68175a14e8024dae135540b9431a423</Password>
 	</User>
-	<User LoginType = "Normal">
+<!--	<User LoginType = "Normal">
 		<LoginName>test1</LoginName>
 		<Password>e4a704ae3f7435cc0c77359bcc224e11</Password>
 	</User>

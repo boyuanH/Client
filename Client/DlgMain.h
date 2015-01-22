@@ -36,11 +36,13 @@ public:
 
 	DECLARE_MESSAGE_MAP()
 private:
-	std::vector<OutputElement> outputElementVector;
-	int outputList();
-	int checkList();
-	void listFilter();
-	void showList();//根据数据outputElementVector显示在控件上
+//	std::vector<OutputElement> outputElement;
+	std::vector<OutUnit> outputEle;
+
+	int listFilter();
+	void showList();
+	void showList(int selDepartment ,int selFile );//根据数据outputElementVector显示在控件上
+	HRESULT getConfigFromXML();
 private:
 	CString m_server;
 	CString m_database;
@@ -50,10 +52,12 @@ public:
 	CCheckListBox m_listboxDepartment;
 	CCheckListBox m_listboxOutputFileType;
 
-
 	CDateTimeCtrl m_DateStart;
 	CDateTimeCtrl m_dateEnd;
+
 	afx_msg void OnBnClickedButtonOk();
 	afx_msg void OnLbnSelchangeListDepartment();
 	afx_msg void OnLbnSelchangeListOutfiletype();
+	afx_msg void OnDtnDatetimechangeDatetimepickerStart(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnDtnDatetimechangeDatetimepickerEnd(NMHDR *pNMHDR, LRESULT *pResult);
 };

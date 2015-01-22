@@ -1,5 +1,5 @@
 #pragma once
-
+#include <vector>
 enum LoginType
 {
 	NORMAL,
@@ -7,11 +7,26 @@ enum LoginType
 	FORBID
 };
 
-struct OutputElement
+// struct OutputElement
+// {
+// 	CString department;
+// 	BOOL isDepartment;
+// 	BOOL isOperation;
+// 	BOOL isAlarm;
+// 	BOOL isTrans;
+// };
+
+struct FileUint
 {
-	CString department;
-	BOOL isDepartment;
-	BOOL isOperation;
-	BOOL isAlarm;
-	BOOL isTrans;
+	CString fileName;
+	BOOL isCheck;
 };
+
+struct OutUnit
+{
+	CString departName;
+	BOOL isDepartment;	
+	std::vector<FileUint> fileEle;
+};
+
+#define CHECKHR  if(FAILED(hr)) return hr;
