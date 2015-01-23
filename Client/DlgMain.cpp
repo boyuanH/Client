@@ -90,21 +90,30 @@ void CDlgMain::OnBnClickedButtonOk()
 	int temp = listFilter();
 	if (4 != temp)
 	{
-		MessageBoxW(_T("%d error",temp));
+		CString strTemp;
+		strTemp.Format(_T("%d Error"),temp);
+		MessageBoxW(strTemp);
 		return ;
 	}
 
 	//检测日期合法性
 	//end的时间大于等于start时间
+
 	COleDateTime t1,t2;
 	m_DateStart.GetTime(t1);
 	m_dateEnd.GetTime(t2);
 
+
+	
 	if (t1>t2)
 	{
 		MessageBoxW(_T("日期选择不正确"));
 		return;
 	}
+	t1.SetTime(0,0,0);
+	t2.SetTime(23,59,59);
+	
+
 
 	//获取路径
 	TCHAR	szFolderPath[MAX_PATH] = {0};
@@ -130,14 +139,25 @@ void CDlgMain::OnBnClickedButtonOk()
 	}  
 
 	//显示提示框
-	CDlgWaiting dlgW ;
-	dlgW.DoModal();
-	//获得配置数据
-	//数据库操作
-	//写入检测文件
-	//写入log文件
-	//数据清空
-
+	CDlgWaiting dlgW(strFolderPath,t1,t2,m_server,m_database,m_username,m_password,outputEle);
+	INT_PTR nResponse = dlgW.DoModal();
+	//操作意外中断
+	if (nResponse == IDOK)
+	{
+		//Log文件
+		//Log文件主要是记录这一次的操作时间，不具体记录内容
+		//MD5校验码
+	}
+	else if (nResponse == IDCANCEL)
+	{
+		//Error Log
+	}
+	else if (nResponse == -1)
+	{
+		//Error Log
+		TRACE(traceAppMsg, 0, "警告: 对话框创建失败，应用程序将意外终止。\n");
+		TRACE(traceAppMsg, 0, "警告: 如果您在对话框上使用 MFC 控件，则无法 #define _AFX_NO_MFC_CONTROLS_IN_DIALOGS。\n");
+	}
 }
 
 void CDlgMain::OnStart()
@@ -156,7 +176,7 @@ void CDlgMain::OnStart()
 
 	//重新从数据库中获取数据
 	//从数据库中获取可选时间范围
-	CADOConnection m_adoConnection((_bstr_t)m_server,(_bstr_t)m_username,(_bstr_t)m_password,(_bstr_t)m_database);
+	CADOConnection m_adoConnection((_bstr_t)m_server,(_bstr_t)m_database,(_bstr_t)m_username,(_bstr_t)m_password);
 	if (!m_adoConnection.OnInitAdo())
 	{
 		MessageBoxW(_T("连接数据库失败"));
@@ -165,7 +185,7 @@ void CDlgMain::OnStart()
 	_RecordsetPtr m_pRecordset;
 	//从数据库初始化数据
 	_bstr_t empSQL=_T("Select * from [caxastat].[dbo].[SYSCLASSFICATION]");
-	m_pRecordset=m_adoConnection.GetRecordset(empSQL);
+	m_pRecordset=m_adoConnection.GetRecordset(empSQL,adCmdText);
 	//读取数据库来填充车间，选择类型
 
 	int count = 0;
@@ -183,21 +203,25 @@ void CDlgMain::OnStart()
 			FileUint fu;
 			fu.fileName =_T("操作文件");fu.isCheck = TRUE; ele.fileEle.push_back(fu);
 			fu.fileName =_T("报警文件");fu.isCheck = TRUE; ele.fileEle.push_back(fu);
-			fu.fileName =_T("传输文件");fu.isCheck = TRUE; ele.fileEle.push_back(fu);			
-		}		
-		outputEle.push_back(ele);
+			fu.fileName =_T("传输文件");fu.isCheck = TRUE; ele.fileEle.push_back(fu);		
+			outputEle.push_back(ele);
+		}
 		m_pRecordset->MoveNext();
 	}
 
-
-	COleDateTime* pStartDate = NULL;
-	COleDateTime* pEndDate = NULL;
+	if (outputEle.empty())
+	{
+		return ;
+	}
+	
+	COleDateTime* pStartDate = &(COleDateTime::GetCurrentTime());
+	COleDateTime* pEndDate = &(COleDateTime::GetCurrentTime());
 	VARIANT varDate;
 	VariantInit(&varDate);
 	V_VT(&varDate) = VT_DATE;
 
 	empSQL=_T("SELECT Top 1 * FROM [caxastat].[dbo].[DeviceOperationAnalysis] order by starttime ");
-	m_pRecordset=m_adoConnection.GetRecordset(empSQL);
+	m_pRecordset=m_adoConnection.GetRecordset(empSQL,adCmdText);
 	while(!m_pRecordset->TheAdoEOF)
 	{
 		varDate = (m_pRecordset->GetCollect("starttime"));
@@ -209,7 +233,7 @@ void CDlgMain::OnStart()
 	}
 
 	empSQL=_T("SELECT Top 1 * FROM [caxastat].[dbo].[DeviceOperationAnalysis] order by starttime DESC");
-	m_pRecordset=m_adoConnection.GetRecordset(empSQL);
+	m_pRecordset=m_adoConnection.GetRecordset(empSQL,adCmdText);
 	while(!m_pRecordset->TheAdoEOF)
 	{
 		varDate = (m_pRecordset->GetCollect("starttime"));
@@ -227,6 +251,8 @@ void CDlgMain::OnStart()
 	delete pStartDate;
 	delete pEndDate;
 	showList();
+	m_listboxDepartment.SetCurSel(0);
+	m_listboxOutputFileType.SetCurSel(0);
 }
 
 BEGIN_MESSAGE_MAP(CDlgMain, CDialogEx)
@@ -271,10 +297,10 @@ void CDlgMain::OnLbnSelchangeListOutfiletype()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	int curSel = m_listboxDepartment.GetCurSel();
-	int temp = 0;
+	//int temp = 0;
 	if (curSel != -1)
 	{
-		for (int i = 0 ;i < outputEle[curSel].fileEle.capacity();i++)
+		for (size_t i = 0 ;i < outputEle[curSel].fileEle.capacity();i++)
 		{
 			if (1 == m_listboxOutputFileType.GetCheck(i))
 			{
@@ -286,7 +312,11 @@ void CDlgMain::OnLbnSelchangeListOutfiletype()
 			}
 		}
 	}
-	
+	else
+	{
+		MessageBoxW(_T("未选择车间号"));
+		return;
+	}
 }
 
 void CDlgMain::showList()
@@ -316,7 +346,7 @@ void CDlgMain::showList(int selDepartment,int selFile)
 	}
 
 	//显示Department部分
-	for (int i = 0;i < outputEle.capacity();i++)
+	for (size_t i = 0;i < outputEle.capacity();i++)
 	{
 		m_listboxDepartment.AddString(outputEle[i].departName);
 
@@ -336,7 +366,7 @@ void CDlgMain::showList(int selDepartment,int selFile)
 	{
 		temp = selDepartment;
 	}
-	int j = 0;
+	size_t j = 0;
 
 	for (;j < outputEle[temp].fileEle.capacity(); j++)
 	{
@@ -359,23 +389,25 @@ void CDlgMain::showList(int selDepartment,int selFile)
 
 int CDlgMain::listFilter()
 {
-	//0.未知错误							提示0
-	//1.禁止outputEle内容为空时输出			提示1
+	//0.禁止outputEle内容为空时输出			提示0
+	//1.没有任何选择						提示1
 	//2.禁止车间选择为是的项，文件选择为空	提示2
 	//3.禁止车间选择为否的项，文件有选择	提示3
 	//4.合法的输出							提示4
 	
 	if (outputEle.empty())
 	{
-		return 1;
-	}
+		return 0;
+	}	
 
-	for (int i = 0;i < outputEle.capacity();i++)
+	
+	BOOL flagA = FALSE;
+	for (size_t i = 0;i < outputEle.capacity();i++)
 	{
 		if (outputEle[i].isDepartment)
 		{
-			BOOL flag = FALSE;
-			for (int j = 0; j < outputEle[i].fileEle.capacity();j++)
+			BOOL flag = FALSE; flagA = TRUE;
+			for (size_t j = 0; j < outputEle[i].fileEle.capacity();j++)
 			{
 				if (outputEle[i].fileEle[j].isCheck)
 				{
@@ -389,14 +421,31 @@ int CDlgMain::listFilter()
 		} 
 		else
 		{
-			for (int j = 0; j < outputEle[i].fileEle.capacity();j++)
-			{
-				if (outputEle[i].fileEle[j].isCheck)
-				{
-					return 3;
-				}
-			}
+// 			BOOL flag = FALSE;
+// 			for (int j = 0; j < outputEle[i].fileEle.capacity();j++)
+// 			{
+// 				if (outputEle[i].fileEle[j].isCheck)
+// 				{
+// 					flag = TRUE;
+// 				}
+// 			}
+// 			if (flag)
+// 			{
+// 				return 3;
+// 			}
+ 			for (size_t j = 0; j < outputEle[i].fileEle.capacity();j++)
+ 			{
+ 				if (outputEle[i].fileEle[j].isCheck)
+ 				{
+ 					return 3;
+ 				}
+ 			}			
 		}
+	}
+
+	if (!flagA)
+	{
+		return 1;
 	}
 
 	return 4;	
@@ -503,6 +552,7 @@ void CDlgMain::OnDtnDatetimechangeDatetimepickerStart(NMHDR *pNMHDR, LRESULT *pR
 {
 	LPNMDATETIMECHANGE pDTChange = reinterpret_cast<LPNMDATETIMECHANGE>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
+
 	*pResult = 0;
 }
 

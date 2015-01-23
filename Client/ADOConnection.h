@@ -7,9 +7,10 @@
 #endif // _MSC_VER > 1000
 
 #pragma once
+#include <vector>
 class CADOConnection
 {
-public:
+private:
 	_RecordsetPtr m_pRecordset;//记录集指针
 	_ConnectionPtr m_pConnection;//数据库连接指针
 	_CommandPtr	m_pCommand;//命令指针
@@ -19,10 +20,13 @@ public:
 	CADOConnection(_bstr_t dataSource,_bstr_t userID,_bstr_t serverPassword,_bstr_t catalog);
 	virtual ~CADOConnection(void);
 	BOOL OnInitAdo();
-	_RecordsetPtr& GetRecordset(_bstr_t bstrSQL);
+	_RecordsetPtr& GetRecordset(_bstr_t bstrSQL,CommandTypeEnum commandType);
+	_RecordsetPtr& GetRecordset();
+	_CommandPtr& GetCommand();
+	_ConnectionPtr& GetConnection();
 	BOOL ExecuteSQL(_bstr_t bstrSQL);
 	void ExitConnect();
-	void ExecuteProc(_bstr_t proc);
+	BOOL ExecuteProc(_bstr_t procName,std::vector<_ParameterPtr> paras);
 
 private:
 	_bstr_t m_dataSource;

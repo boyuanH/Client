@@ -16,6 +16,14 @@ enum LoginType
 // 	BOOL isTrans;
 // };
 
+struct DatabaseInfo
+{
+	CString server;
+	CString database;
+	CString username;
+	CString password;
+};
+
 struct FileUint
 {
 	CString fileName;
