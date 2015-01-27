@@ -51,6 +51,9 @@
     <ClInclude Include="DlgWaiting.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="AddStaff.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Client.cpp">
@@ -75,6 +78,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DlgWaiting.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="AddStaff.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

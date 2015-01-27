@@ -101,6 +101,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AddStaff.h" />
     <ClInclude Include="ADOConnection.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="ClientDlg.h" />
@@ -114,6 +115,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AddStaff.cpp" />
     <ClCompile Include="ADOConnection.cpp" />
     <ClCompile Include="Client.cpp" />
     <ClCompile Include="ClientDlg.cpp" />

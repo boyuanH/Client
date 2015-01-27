@@ -27,6 +27,8 @@ private:
 	COleDateTime m_endDateTime;
 	std::vector<OutUnit> m_outputEle;
 
+	OutputInfo m_outInfo;
+
 private:
 	void deleteDirectory(CString strDir);
 
@@ -41,4 +43,11 @@ public:
 
 	afx_msg void OnBnClickedExitdlg();
 	virtual BOOL OnInitDialog();
+
+private:
+	CWinThread* m_pThread;
+public:
+	afx_msg LRESULT OnClose(WPARAM wParam,LPARAM lParam);
 };
+
+UINT ThreadFunc(LPVOID pParm);

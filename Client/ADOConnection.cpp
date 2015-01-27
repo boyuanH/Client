@@ -37,6 +37,7 @@ BOOL CADOConnection::OnInitAdo()
 	try
 	{
 		m_pConnection.CreateInstance("ADODB.Connection");
+		//m_pConnection.CreateInstance(__uuidof(Command));
 		_bstr_t strConnect;
 		strConnect = _T("Provider=SQLOLEDB.1;Persist Security Info=False");
 		strConnect = strConnect +_T(";Data Source=")+ m_dataSource +_T(";Initial Catalog=")+m_catalog +_T(";User ID=") + m_userID +_T(";Password=") + m_serverPassword;
@@ -181,8 +182,12 @@ BOOL CADOConnection::ExecuteProc(_bstr_t procName,std::vector<_ParameterPtr> par
 
 void CADOConnection::ExitConnect()
 {
-	if(m_pRecordset!=NULL)
+	if(m_pRecordset!= NULL)
 		m_pRecordset->Close();
+	if (m_pCommand != NULL)
+	{
+		m_pCommand->Cancel();
+	}
 
 	m_pConnection->Close();
 	::CoUninitialize();

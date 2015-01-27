@@ -8,6 +8,7 @@
 #include "ADOConnection.h"
 #include "ConfigDlg.h"
 #include "DlgWaiting.h"
+#include "AddStaff.h"
 
 
 // CDlgMain 对话框
@@ -74,7 +75,8 @@ void CDlgMain::OnDataConfig()
 
 void CDlgMain::OnAddStaff()
 {
-	MessageBoxW(_T("Staff"));
+	CAddStaff dlg;
+	dlg.DoModal();
 }
 
 void CDlgMain::OnAbout()
@@ -99,25 +101,25 @@ void CDlgMain::OnBnClickedButtonOk()
 	//检测日期合法性
 	//end的时间大于等于start时间
 
-	COleDateTime t1,t2;
+	COleDateTime t1,t2,tempdate;
 	m_DateStart.GetTime(t1);
 	m_dateEnd.GetTime(t2);
-
-
+	m_DateStart.GetTime(tempdate);
 	
 	if (t1>t2)
 	{
 		MessageBoxW(_T("日期选择不正确"));
 		return;
 	}
-	t1.SetTime(0,0,0);
-	t2.SetTime(23,59,59);
 	
-
+	t1.SetDateTime(tempdate.GetYear(),tempdate.GetMonth(),tempdate.GetDay(),0,0,0);
+	m_dateEnd.GetTime(tempdate);
+	t2.SetDateTime(tempdate.GetYear(),tempdate.GetMonth(),tempdate.GetDay(),23,59,59);
+	
 
 	//获取路径
 	TCHAR	szFolderPath[MAX_PATH] = {0};
-	CString strFolderPath;
+	CString strFolderPath;	
 	BROWSEINFO      sInfo;  
 	::ZeroMemory(&sInfo, sizeof(BROWSEINFO));  
 	sInfo.pidlRoot   = 0;  
@@ -137,13 +139,14 @@ void CDlgMain::OnBnClickedButtonOk()
 	{  
 		::CoTaskMemFree(lpidlBrowse);  
 	}  
-
+	
 	//显示提示框
 	CDlgWaiting dlgW(strFolderPath,t1,t2,m_server,m_database,m_username,m_password,outputEle);
 	INT_PTR nResponse = dlgW.DoModal();
 	//操作意外中断
 	if (nResponse == IDOK)
 	{
+		MessageBoxW(_T("输出完成"));
 		//Log文件
 		//Log文件主要是记录这一次的操作时间，不具体记录内容
 		//MD5校验码
